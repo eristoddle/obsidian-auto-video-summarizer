@@ -121,3 +121,6 @@ Note: Include all sections. If there are no technical terms, omit that section e
 
 export const DEFAULT_MAX_TOKENS = 10000;
 export const DEFAULT_TEMPERATURE = 1;
+
+export const DEFAULT_AUTO_SUMMARIZE_WEBCLIPS = false;
+export const DEFAULT_AUTO_SUMMARIZE_PASTED_URLS = false;
