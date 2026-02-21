@@ -10,9 +10,9 @@ import { ProvidersFactory } from './services/providers/providersFactory';
 import { AIModelProvider } from './types';
 
 /**
- * Represents the YouTube Summarizer Plugin.
+ * Represents the YouTube Auto Video Summarizer Plugin.
  * This class extends the Plugin class and provides the main functionality
- * for the YouTube Summarizer Plugin.
+ * for the YouTube Auto Video Summarizer Plugin.
  */
 export class YouTubeSummarizerPlugin extends Plugin {
 	settings: PluginSettings;

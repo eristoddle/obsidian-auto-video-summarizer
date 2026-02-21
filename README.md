@@ -1,6 +1,6 @@
-# YouTube Video Summarizer for Obsidian
+# YouTube Auto Video Summarizer for Obsidian
 
-Generate AI-powered summaries of YouTube videos directly in Obsidian using Google's Gemini AI.
+Generate AI-powered summaries of YouTube videos directly in Obsidian using various AI providers like Gemini, OpenAI, and Anthropic.
 
 ## Demo
 
@@ -8,7 +8,8 @@ Generate AI-powered summaries of YouTube videos directly in Obsidian using Googl
 
 ## Features
 
--   🎥 Extract transcripts from YouTube videos
+-   🎥 **Auto-Summarization**: Automatically generate summaries for YouTube URLs pasted into the editor or from new webclips.
+-   🎬 Extract transcripts from YouTube videos
 -   🤖 Generate summaries using various LLMs: Gemini, OpenAI, Anthropic (Claude), and other compatible models
 -   📝 Create structured notes with key points
 -   🔍 Identify and explain technical terms
@@ -18,7 +19,7 @@ Generate AI-powered summaries of YouTube videos directly in Obsidian using Googl
 
 1. Open Obsidian Settings
 2. Go to Community Plugins and disable Safe Mode
-3. Click Browse and search for "YouTube Video Summarizer"
+3. Click Browse and search for "YouTube Auto Video Summarizer"
 4. Install and enable the plugin
 
 ## Requirements
@@ -28,20 +29,29 @@ Generate AI-powered summaries of YouTube videos directly in Obsidian using Googl
     -   Gemini API key ([Get one here](https://aistudio.google.com/app/apikey))
     -   OpenAI API key ([Get one here](https://platform.openai.com/api-keys))
     -   Anthropic API key ([Get one here](https://console.anthropic.com/settings/keys))
-    -   Key for any LLM provider, offering OpenAI or Antropic compatible API
+    -   Key for any LLM provider, offering OpenAI or Anthropic compatible API
 
 ## Configuration
 
 ### Initial Setup
 
-To start using the YouTube Video Summarizer plugin, you need to:
+To start using the YouTube Auto Video Summarizer plugin, you need to:
 
-1. Navigate to the plugin settings by clicking on the Settings icon in Obsidian and finding "YouTube Video Summarizer" in the Community plugins section.
+1. Navigate to the plugin settings by clicking on the Settings icon in Obsidian and finding "YouTube Auto Video Summarizer" in the Community plugins section.
 2. In the "AI Providers" tab, select an AI provider (Gemini, OpenAI, Anthropic, etc.) by expanding its section.
 3. Enter your API key for the selected provider.
 4. Choose an active model from the dropdown at the top of the settings page.
 
 Once these steps are completed, the plugin is ready to generate summaries of YouTube videos.
+
+### Auto-Summarization Settings
+
+The plugin now supports automatic summarization:
+
+-   **Auto-summarize webclips**: When enabled, the plugin will automatically generate a summary for any new note that has a YouTube URL in its `source` frontmatter property (commonly used by web clipper extensions).
+-   **Auto-summarize pasted URLs**: When enabled, the plugin will automatically generate a summary whenever you paste a YouTube URL directly into the editor.
+
+These options can be toggled in the "Summary Settings" tab.
 
 ### Managing AI Models
 
@@ -106,6 +116,12 @@ Lower values (closer to 0) produce more consistent and focused summaries, while 
 2. Select the URL
 3. Use command palette or context menu to summarize
 
+### Method 3: Auto-Summarization (New!)
+
+1. Enable Auto-summarization in settings.
+2. Paste a YouTube URL or import a webclip with a YouTube source.
+3. The summary will be generated automatically!
+
 ## Output Format
 
 ```markdown
@@ -137,4 +153,3 @@ Lower values (closer to 0) produce more consistent and focused summaries, while 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-

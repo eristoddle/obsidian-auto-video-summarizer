@@ -7,7 +7,7 @@ import { SettingsUIComponents } from './components/SettingsUIComponents';
 import { YouTubeSummarizerPlugin } from '../main';
 
 /**
- * Represents the settings tab for the YouTube Summarizer Plugin.
+ * Represents the settings tab for the YouTube Auto Video Summarizer Plugin.
  * This class extends the PluginSettingTab and provides a user interface
  * for configuring the plugin's settings.
  */
