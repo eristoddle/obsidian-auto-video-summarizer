@@ -38,6 +38,8 @@ export interface StoredSettings {
 	customPrompt: string;
 	maxTokens: number;
 	temperature: number;
+	autoSummarizeWebclips: boolean;
+	autoSummarizePastedUrls: boolean;
 }
 
 /** Represents the plugin settings and provides methods to manage them */
@@ -61,6 +63,18 @@ export interface PluginSettings {
 
 	/** Gets the temperature setting for API requests */
 	getTemperature(): number;
+
+	/** Gets whether webclips should be automatically summarized */
+	getAutoSummarizeWebclips(): boolean;
+
+	/** Updates the auto-summarize webclips setting */
+	updateAutoSummarizeWebclips(value: boolean): Promise<void>;
+
+	/** Gets whether pasted URLs should be automatically summarized */
+	getAutoSummarizePastedUrls(): boolean;
+
+	/** Updates the auto-summarize pasted URLs setting */
+	updateAutoSummarizePastedUrls(value: boolean): Promise<void>;
 
 	/** Adds a new provider */
 	addProvider(provider: ProviderConfig): void;

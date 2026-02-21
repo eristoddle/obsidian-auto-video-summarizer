@@ -213,6 +213,28 @@ export class SettingsTab extends PluginSettingTab {
                         await this.settings.updateTemperature(Number(value));
                     })
             );
+
+        new Setting(containerEl)
+            .setName('Auto-summarize webclips')
+            .setDesc('Automatically generate summaries for new webclips that have a YouTube URL in the "source" field')
+            .addToggle(toggle =>
+                toggle
+                    .setValue(this.settings.getAutoSummarizeWebclips())
+                    .onChange(async (value) => {
+                        await this.settings.updateAutoSummarizeWebclips(value);
+                    })
+            );
+
+        new Setting(containerEl)
+            .setName('Auto-summarize pasted URLs')
+            .setDesc('Automatically generate summaries when a YouTube URL is pasted into the editor')
+            .addToggle(toggle =>
+                toggle
+                    .setValue(this.settings.getAutoSummarizePastedUrls())
+                    .onChange(async (value) => {
+                        await this.settings.updateAutoSummarizePastedUrls(value);
+                    })
+            );
     }
 
     private reload(): void {

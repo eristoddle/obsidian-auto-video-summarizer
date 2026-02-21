@@ -1,4 +1,4 @@
-import { Editor, MarkdownView, Notice, Plugin } from 'obsidian';
+import { Editor, MarkdownView, Notice, Plugin, TFile, TAbstractFile } from 'obsidian';
 import { PluginSettings, TranscriptResponse } from './types';
 
 import { SettingsTab } from './ui/settings';
@@ -34,9 +34,27 @@ export class YouTubeSummarizerPlugin extends Plugin {
 
 			// Register commands
 			this.registerCommands();
+
+			// Register event listeners
+			this.registerEvents();
 		} catch (error) {
 			new Notice(`Error: ${error.message}`);
 		}
+	}
+
+	/**
+	 * Registers event listeners for auto-summarization.
+	 */
+	private registerEvents(): void {
+		// Listen for file changes to detect YouTube URLs in frontmatter
+		this.registerEvent(
+			this.app.metadataCache.on('changed', (file) => this.handleFileChange(file))
+		);
+
+		// Listen for paste events to detect YouTube URLs
+		this.registerEvent(
+			this.app.workspace.on('editor-paste', (evt, editor) => this.handlePaste(evt, editor))
+		);
 	}
 
 	public async saveData(data: any): Promise<void> {
@@ -130,14 +148,27 @@ export class YouTubeSummarizerPlugin extends Plugin {
 	/**
 	 * Summarizes the YouTube video for the given URL and updates the markdown view with the summary.
 	 * @param url - The URL of the YouTube video to summarize.
-	 * @param view - The active markdown view where the summary will be inserted.
+	 * @param editor - The editor instance where the summary will be inserted.
 	 * @returns {Promise<void>} A promise that resolves when the video is summarized.
 	 */
 	private async summarizeVideo(url: string, editor: Editor): Promise<void> {
+		const content = await this.processVideoSummarization(url);
+		if (content) {
+			editor.replaceSelection(content);
+			new Notice('Summary generated successfully!');
+		}
+	}
+
+	/**
+	 * Core logic for fetching transcript and generating summary for a YouTube video.
+	 * @param url - The URL of the YouTube video to summarize.
+	 * @returns {Promise<string | null>} A promise that resolves with the formatted summary content, or null if it fails.
+	 */
+	private async processVideoSummarization(url: string): Promise<string | null> {
 		// Check if a video is already being processed
 		if (this.isProcessing) {
 			new Notice('Already processing a video, please wait...');
-			return;
+			return null;
 		}
 
 		try {
@@ -147,7 +178,7 @@ export class YouTubeSummarizerPlugin extends Plugin {
 
 			if (!selectedModel) {
 				new Notice('No AI model selected. Please select a model in the plugin settings.');
-				return;
+				return null;
 			}
 
 			// Check if the selected model's provider has an API key
@@ -155,12 +186,12 @@ export class YouTubeSummarizerPlugin extends Plugin {
 				new Notice(
 					`${selectedModel.provider.name} API key is missing. Please set it in the plugin settings.`
 				);
-				return;
+				return null;
 			}
 
 			if (!this.provider) {
 				new Notice('AI provider not initialized. Please check your settings.');
-				return;
+				return null;
 			}
 
 			// Fetch the video transcript
@@ -170,7 +201,7 @@ export class YouTubeSummarizerPlugin extends Plugin {
 				transcript = await this.youtubeService.fetchTranscript(url);
 			} catch (error) {
 				new Notice(`Error: ${error.message}`);
-				return;
+				return null;
 			}
 			const thumbnailUrl = YouTubeService.getThumbnailUrl(
 				transcript.videoId
@@ -185,27 +216,76 @@ export class YouTubeSummarizerPlugin extends Plugin {
 				summary = await this.provider.summarizeVideo(transcript.videoId, prompt);
 			} catch (error) {
 				new Notice(`Error: ${error.message}`);
-				console.error('Failed to fetch transcript:', error);
-				return;
+				console.error('Failed to generate summary:', error);
+				return null;
 			}
 
 			// Create the summary content
-			const content = this.generateSummary(
+			return this.generateSummary(
 				transcript,
 				thumbnailUrl,
 				url,
 				summary
 			);
-
-			// Insert the summary into the markdown view
-			editor.replaceSelection(content);
-			new Notice('Summary generated successfully!');
 		} catch (error) {
 			new Notice(`Error: ${error.message}`);
 			console.error('Summary generation failed:', error);
+			return null;
 		} finally {
 			// Reset the processing flag
 			this.isProcessing = false;
+		}
+	}
+
+	/**
+	 * Checks if a file has already been summarized by this plugin.
+	 * @param file - The file to check.
+	 * @returns True if the file has the 'yt-summarized' marker in its frontmatter.
+	 */
+	private isAlreadySummarized(file: TFile): boolean {
+		const cache = this.app.metadataCache.getFileCache(file);
+		return cache?.frontmatter?.['yt-summarized'] === true;
+	}
+
+	/**
+	 * Handler for file changes to detect YouTube URLs in frontmatter and auto-summarize.
+	 * @param file - The file that changed.
+	 */
+	private async handleFileChange(file: TAbstractFile): Promise<void> {
+		if (!(file instanceof TFile)) return;
+		if (!this.settings.getAutoSummarizeWebclips()) return;
+
+		const cache = this.app.metadataCache.getFileCache(file);
+		const source = cache?.frontmatter?.source;
+
+		if (source && YouTubeService.isYouTubeUrl(source)) {
+			if (this.isAlreadySummarized(file)) return;
+
+			const content = await this.processVideoSummarization(source);
+			if (content) {
+				await this.app.vault.append(file, '\n' + content);
+				await this.app.fileManager.processFrontMatter(file, (frontmatter) => {
+					frontmatter['yt-summarized'] = true;
+				});
+				new Notice('Auto-summary generated for webclip!');
+			}
+		}
+	}
+
+	/**
+	 * Handler for paste events in the editor to detect YouTube URLs and auto-summarize.
+	 * @param evt - The clipboard event.
+	 * @param editor - The editor instance.
+	 */
+	private async handlePaste(evt: ClipboardEvent, editor: Editor): Promise<void> {
+		if (!this.settings.getAutoSummarizePastedUrls()) return;
+
+		const pastedText = evt.clipboardData?.getData('text');
+		if (pastedText && YouTubeService.isYouTubeUrl(pastedText.trim())) {
+			// Small delay to allow the paste to complete before appending the summary
+			setTimeout(async () => {
+				await this.summarizeVideo(pastedText.trim(), editor);
+			}, 100);
 		}
 	}
 

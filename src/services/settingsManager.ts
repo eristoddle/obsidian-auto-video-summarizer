@@ -1,7 +1,7 @@
 import YouTubeSummarizerPlugin from "src/main";
 import { Notice } from "obsidian";
 import { ModelConfig, PluginSettings, ProviderConfig, StoredModel, StoredProvider, StoredSettings } from "src/types";
-import { DEFAULT_PROVIDERS, DEFAULT_SELECTED_MODEL, DEFAULT_PROMPT, DEFAULT_MAX_TOKENS, DEFAULT_TEMPERATURE } from "src/defaults";
+import { DEFAULT_PROVIDERS, DEFAULT_SELECTED_MODEL, DEFAULT_PROMPT, DEFAULT_MAX_TOKENS, DEFAULT_TEMPERATURE, DEFAULT_AUTO_SUMMARIZE_WEBCLIPS, DEFAULT_AUTO_SUMMARIZE_PASTED_URLS } from "src/defaults";
 
 /** Manages plugin settings and provides methods to interact with them */
 export class SettingsManager implements PluginSettings {
@@ -17,7 +17,9 @@ export class SettingsManager implements PluginSettings {
             selectedModelId: DEFAULT_SELECTED_MODEL,
             customPrompt: DEFAULT_PROMPT,
             maxTokens: DEFAULT_MAX_TOKENS,
-            temperature: DEFAULT_TEMPERATURE
+            temperature: DEFAULT_TEMPERATURE,
+            autoSummarizeWebclips: DEFAULT_AUTO_SUMMARIZE_WEBCLIPS,
+            autoSummarizePastedUrls: DEFAULT_AUTO_SUMMARIZE_PASTED_URLS
         };
     }
 
@@ -48,7 +50,9 @@ export class SettingsManager implements PluginSettings {
                 selectedModelId: oldSettings.selectedModel,
                 customPrompt: oldSettings.customPrompt,
                 maxTokens: oldSettings.maxTokens,
-                temperature: oldSettings.temperature
+                temperature: oldSettings.temperature,
+                autoSummarizeWebclips: DEFAULT_AUTO_SUMMARIZE_WEBCLIPS,
+                autoSummarizePastedUrls: DEFAULT_AUTO_SUMMARIZE_PASTED_URLS
             };
 
             // Save in new format
@@ -60,7 +64,9 @@ export class SettingsManager implements PluginSettings {
                 selectedModelId: loaded?.settings.selectedModelId ?? this.settings.selectedModelId,
                 customPrompt: loaded?.settings.customPrompt ?? this.settings.customPrompt,
                 maxTokens: loaded?.settings.maxTokens ?? this.settings.maxTokens,
-                temperature: loaded?.settings.temperature ?? this.settings.temperature
+                temperature: loaded?.settings.temperature ?? this.settings.temperature,
+                autoSummarizeWebclips: loaded?.settings.autoSummarizeWebclips ?? this.settings.autoSummarizeWebclips,
+                autoSummarizePastedUrls: loaded?.settings.autoSummarizePastedUrls ?? this.settings.autoSummarizePastedUrls
             };
         }
     }
@@ -107,6 +113,28 @@ export class SettingsManager implements PluginSettings {
     /** Gets the temperature setting for API requests */
     getTemperature(): number {
         return this.settings.temperature;
+    }
+
+    /** Gets whether webclips should be automatically summarized */
+    getAutoSummarizeWebclips(): boolean {
+        return this.settings.autoSummarizeWebclips;
+    }
+
+    /** Updates the auto-summarize webclips setting */
+    async updateAutoSummarizeWebclips(value: boolean): Promise<void> {
+        this.settings.autoSummarizeWebclips = value;
+        await this.saveData();
+    }
+
+    /** Gets whether pasted URLs should be automatically summarized */
+    getAutoSummarizePastedUrls(): boolean {
+        return this.settings.autoSummarizePastedUrls;
+    }
+
+    /** Updates the auto-summarize pasted URLs setting */
+    async updateAutoSummarizePastedUrls(value: boolean): Promise<void> {
+        this.settings.autoSummarizePastedUrls = value;
+        await this.saveData();
     }
 
     /** Adds a new provider */
