@@ -69,8 +69,10 @@ export class YouTubeSummarizerPlugin extends Plugin {
 	 * @throws {Error} Throws an error if the services cannot be initialized.
 	 */
 	public async initializeServices(): Promise<void> {
-		// Initialize settings manager
-		this.settings = new SettingsManager(this);
+		// Initialize settings manager if it doesn't exist
+		if (!this.settings) {
+			this.settings = new SettingsManager(this);
+		}
 		await this.settings.loadSettings();
 		// Initialize youtube service
 		this.youtubeService = new YouTubeService();

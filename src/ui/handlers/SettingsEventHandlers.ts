@@ -56,7 +56,7 @@ export class SettingsEventHandlers {
 
     async handleProviderAdd(provider: ProviderConfig): Promise<void> {
         try {
-            this.plugin.settings.addProvider(provider);
+            await this.plugin.settings.addProvider(provider);
             this.callbacks.onProviderAdded?.(provider);
         } catch (error) {
             new Notice(`Failed to add provider: ${error.message}`);
@@ -66,7 +66,7 @@ export class SettingsEventHandlers {
 
     async handleProviderEdit(provider: ProviderConfig, originalName: string): Promise<void> {
         try {
-            this.plugin.settings.updateProvider(provider, originalName);
+            await this.plugin.settings.updateProvider(provider, originalName);
             this.callbacks.onProviderUpdated?.(provider, originalName);
             new Notice(`Provider ${provider.name} updated successfully`);
         } catch (error) {
@@ -94,7 +94,7 @@ export class SettingsEventHandlers {
     // Click on a "Delete" button at confirmation popup
     async handleProviderDelete(provider: ProviderConfig): Promise<void> {
         try {
-            this.plugin.settings.deleteProvider(provider);
+            await this.plugin.settings.deleteProvider(provider);
             this.callbacks.onProviderDeleted?.(provider);
             new Notice(`Provider ${provider.name} deleted successfully`);
         } catch (error) {
@@ -106,7 +106,7 @@ export class SettingsEventHandlers {
 
     async handleModelAdd(model: ModelConfig): Promise<void> {
         try {
-            this.plugin.settings.addModel(model);
+            await this.plugin.settings.addModel(model);
             this.callbacks.onModelAdded?.(model);
         } catch (error) {
             new Notice(`Failed to add model: ${error.message}`);
@@ -116,7 +116,7 @@ export class SettingsEventHandlers {
 
     async handleModelEdit(model: ModelConfig): Promise<void> {
         try {
-            this.plugin.settings.updateModel(
+            await this.plugin.settings.updateModel(
                 model.name,
                 model.displayName || model.name,
                 model.provider.name
@@ -130,7 +130,7 @@ export class SettingsEventHandlers {
 
     async handleModelDelete(model: ModelConfig): Promise<void> {
         try {
-            this.plugin.settings.deleteModel(model.provider.name, model.name);
+            await this.plugin.settings.deleteModel(model.provider.name, model.name);
             this.callbacks.onModelDeleted?.(model);
         } catch (error) {
             console.error('Error deleting model:', error);
