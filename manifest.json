@@ -2,7 +2,7 @@
 	"id": "yt-video-summarizer",
 	"name": "YouTube Auto Video Summarizer",
 	"minAppVersion": "0.15.0",
-	"version": "1.2.2",
+	"version": "1.2.3",
 	"description": "Summarize YouTube videos using AI (Gemini, OpenAI, Anthropic). Extract transcripts, generate summaries, and create structured notes. Now with auto-summarization for webclips and pasted URLs.",
 	"author": "mbramani",
 	"authorUrl": "https://github.com/mbramani",
