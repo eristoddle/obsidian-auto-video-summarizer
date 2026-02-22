@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting } from 'obsidian';
+import { App, Notice, PluginSettingTab, Setting } from 'obsidian';
 import { ModelConfig, PluginSettings } from '../types';
 import { SettingsEventHandlers, UICallbacks } from './handlers/SettingsEventHandlers';
 
@@ -86,6 +86,25 @@ export class SettingsTab extends PluginSettingTab {
         // Display sections
         this.displayAIProvidersSection(aiProvidersContent);
         this.displaySummarySettingsSection(summarySettingsContent);
+
+        // Add Save Button
+        const saveButtonContainer = containerEl.createDiv({ cls: 'yt-summarizer-settings__save-button-container' });
+        new Setting(saveButtonContainer)
+            .addButton(button =>
+                button
+                    .setButtonText('Save Settings')
+                    .setCta()
+                    .onClick(async () => {
+                        try {
+                            // The settings are already saved on change, but this provides a manual trigger and feedback
+                            await this.plugin.settings.saveSettings();
+                            new Notice('Settings saved successfully');
+                        } catch (error) {
+                            new Notice('Failed to save settings');
+                            console.error('Save error:', error);
+                        }
+                    })
+            );
     }
 
     private createTabButtons(tabList: HTMLElement): void {

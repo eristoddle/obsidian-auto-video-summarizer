@@ -58,7 +58,7 @@ const DEFAULT_ANTHROPIC_MODELS = [
     }
 ];
 
-export const DEFAULT_SELECTED_MODEL = 'Gemini:gemini-1.5-pro';
+export const DEFAULT_SELECTED_MODEL = 'Gemini:gemini-2.0-flash';
 
 export const DEFAULT_PROVIDERS: StoredProvider[] = [
     {

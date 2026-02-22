@@ -352,3 +352,15 @@ If your plugin does not need CSS, delete this file.
 	margin-top: var(--size-4-6);
 	margin-bottom: var(--size-4-3);
 }
+
+/* Save Button */
+.yt-summarizer-settings__save-button-container {
+	margin-top: var(--size-4-8);
+	padding-top: var(--size-4-4);
+	border-top: 1px solid var(--background-modifier-border);
+}
+
+.yt-summarizer-settings__save-button-container .setting-item {
+	border: none;
+	padding: 0;
+}

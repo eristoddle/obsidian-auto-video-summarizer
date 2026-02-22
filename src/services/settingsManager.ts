@@ -138,7 +138,7 @@ export class SettingsManager implements PluginSettings {
     }
 
     /** Adds a new provider */
-    addProvider(provider: ProviderConfig): void {
+    async addProvider(provider: ProviderConfig): Promise<void> {
         const storedProvider: StoredProvider = {
             ...provider,
             models: []
@@ -149,11 +149,11 @@ export class SettingsManager implements PluginSettings {
         }
 
         this.settings.providers.push(storedProvider);
-        this.saveData();
+        await this.saveData();
     }
 
     /** Adds a new model to a provider */
-    addModel(model: ModelConfig): void {
+    async addModel(model: ModelConfig): Promise<void> {
         const provider = this.settings.providers.find(p => p.name === model.provider.name);
         if (!provider) {
             throw new Error('Provider not found');
@@ -169,11 +169,11 @@ export class SettingsManager implements PluginSettings {
         }
 
         provider.models.push(storedModel);
-        this.saveData();
+        await this.saveData();
     }
 
     /** Updates an existing provider */
-    updateProvider(provider: ProviderConfig, originalName: string): void {
+    async updateProvider(provider: ProviderConfig, originalName: string): Promise<void> {
         const storedProvider = this.settings.providers.find(p => p.name === originalName);
         if (!storedProvider) {
             throw new Error('Provider not found');
@@ -190,11 +190,11 @@ export class SettingsManager implements PluginSettings {
 
         const index = this.settings.providers.indexOf(storedProvider);
         this.settings.providers[index] = updatedProvider;
-        this.saveData();
+        await this.saveData();
     }
 
     /** Updates an existing model */
-    updateModel(modelName: string, modelDisplayName: string, providerName: string): void {
+    async updateModel(modelName: string, modelDisplayName: string, providerName: string): Promise<void> {
         const provider = this.settings.providers.find(p => p.name === providerName);
         if (!provider) {
             throw new Error('Provider not found');
@@ -216,11 +216,11 @@ export class SettingsManager implements PluginSettings {
 
         // Update the model
         model.displayName = modelDisplayName;
-        this.saveData();
+        await this.saveData();
     }
 
     /** Deletes a provider */
-    deleteProvider(provider: ProviderConfig): void {
+    async deleteProvider(provider: ProviderConfig): Promise<void> {
         const storedProvider = this.settings.providers.find(p => p.name === provider.name);
         if (!storedProvider) {
             throw new Error('Provider not found');
@@ -228,18 +228,19 @@ export class SettingsManager implements PluginSettings {
 
         if (storedProvider.models.length > 0) {
             // remove all models associated with this provider
-            storedProvider.models.forEach(model => {
-                this.deleteModel(storedProvider.name, model.name);
-            });
+            const modelDeletions = storedProvider.models.map(model =>
+                this.deleteModel(storedProvider.name, model.name)
+            );
+            await Promise.all(modelDeletions);
         }
 
         const index = this.settings.providers.indexOf(storedProvider);
         this.settings.providers.splice(index, 1);
-        this.saveData();
+        await this.saveData();
     }
 
     /** Deletes a model */
-    deleteModel(providerName: string, modelName: string): void {
+    async deleteModel(providerName: string, modelName: string): Promise<void> {
         // Найдем провайдера по имени
         const provider = this.settings.providers.find(p => p.name === providerName);
 
@@ -261,25 +262,25 @@ export class SettingsManager implements PluginSettings {
 
         // Удалим модель из списка
         provider.models.splice(index, 1);
-        this.saveData();
+        await this.saveData();
     }
 
     /** Updates the custom prompt template */
-    updateCustomPrompt(prompt: string): void {
+    async updateCustomPrompt(prompt: string): Promise<void> {
         this.settings.customPrompt = prompt;
-        this.saveData();
+        await this.saveData();
     }
 
     /** Updates the maximum number of tokens */
-    updateMaxTokens(tokens: number): void {
+    async updateMaxTokens(tokens: number): Promise<void> {
         this.settings.maxTokens = tokens;
-        this.saveData();
+        await this.saveData();
     }
 
     /** Updates the temperature setting */
-    updateTemperature(temperature: number): void {
+    async updateTemperature(temperature: number): Promise<void> {
         this.settings.temperature = temperature;
-        this.saveData();
+        await this.saveData();
     }
 
 
@@ -299,7 +300,7 @@ export class SettingsManager implements PluginSettings {
         await this.saveData();
     }
 
-    private async saveData(): Promise<void> {
+    public async saveSettings(): Promise<void> {
         try {
             await this.plugin.saveData({
                 settings: this.settings
@@ -308,6 +309,10 @@ export class SettingsManager implements PluginSettings {
             new Notice('Failed to save settings');
             console.error('Failed to save settings:', error);
         }
+    }
+
+    private async saveData(): Promise<void> {
+        await this.saveSettings();
     }
 
     private validateProvider(provider: StoredProvider, originalName?: string): boolean {

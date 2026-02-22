@@ -46,6 +46,8 @@ export interface StoredSettings {
 export interface PluginSettings {
 	/** Loads the settings from the plugin */
 	loadSettings(): Promise<void>;
+	/** Saves the settings to the plugin */
+	saveSettings(): Promise<void>;
 	/** Gets the currently selected model */
 	getSelectedModel(): ModelConfig | null;
 
@@ -77,34 +79,34 @@ export interface PluginSettings {
 	updateAutoSummarizePastedUrls(value: boolean): Promise<void>;
 
 	/** Adds a new provider */
-	addProvider(provider: ProviderConfig): void;
+	addProvider(provider: ProviderConfig): Promise<void>;
 
 	/** Adds a new model to a provider */
-	addModel(model: ModelConfig): void;
+	addModel(model: ModelConfig): Promise<void>;
 
 	/** Updates an existing provider */
-	updateProvider(provider: ProviderConfig, originalName: string): void;
+	updateProvider(provider: ProviderConfig, originalName: string): Promise<void>;
 
 	/** Updates an existing model */
-	updateModel(modelName: string, modelDisplayName: string, providerName: string): void;
+	updateModel(modelName: string, modelDisplayName: string, providerName: string): Promise<void>;
 
 	/** Deletes a provider if it has no associated models */
-	deleteProvider(provider: ProviderConfig): void;
+	deleteProvider(provider: ProviderConfig): Promise<void>;
 
 	/** Deletes a model */
-	deleteModel(providerName: string, modelName: string): void;
+	deleteModel(providerName: string, modelName: string): Promise<void>;
 
 	/** Updates the selected model */
 	updateActiveModel(modelId: string): Promise<void>;
 
 	/** Updates the custom prompt template */
-	updateCustomPrompt(prompt: string): void;
+	updateCustomPrompt(prompt: string): Promise<void>;
 
 	/** Updates the maximum number of tokens */
-	updateMaxTokens(tokens: number): void;
+	updateMaxTokens(tokens: number): Promise<void>;
 
 	/** Updates the temperature setting */
-	updateTemperature(temperature: number): void;
+	updateTemperature(temperature: number): Promise<void>;
 
 	/** Saves the API key for a provider without validation */
 	saveProviderKey(providerName: string, key: string): Promise<void>;
